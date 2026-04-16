@@ -1,6 +1,7 @@
 package com.comercialmoises.controller;
 
 import com.comercialmoises.dto.ClienteDTO;
+import com.comercialmoises.dto.VentaHistorialDTO;
 import com.comercialmoises.services.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,11 @@ public class ClienteController {
     @GetMapping("/{id}")
     public ResponseEntity<ClienteDTO> buscarPorId(@PathVariable Integer id) {
         return ResponseEntity.ok(service.buscarPorId(id));
+    }
+
+    @GetMapping("/{id}/historial")
+    public ResponseEntity<List<VentaHistorialDTO>> getHistorial(@PathVariable Integer id) {
+        return ResponseEntity.ok(service.getHistorial(id));
     }
 
     @PostMapping

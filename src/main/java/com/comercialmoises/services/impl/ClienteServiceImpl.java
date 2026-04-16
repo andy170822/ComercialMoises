@@ -1,10 +1,12 @@
 package com.comercialmoises.services.impl;
 
 import com.comercialmoises.dto.ClienteDTO;
+import com.comercialmoises.dto.VentaHistorialDTO;
 import com.comercialmoises.exception.ResourceNotFoundException;
 import com.comercialmoises.mappers.ClienteMapper;
 import com.comercialmoises.model.Cliente;
 import com.comercialmoises.repository.ClienteRepository;
+import com.comercialmoises.repository.VentaRepository;
 import com.comercialmoises.services.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,11 +21,14 @@ public class ClienteServiceImpl implements ClienteService {
     private ClienteRepository repository;
 
     @Autowired
+    private VentaRepository ventaRepository;
+
+    @Autowired
     private ClienteMapper mapper;
 
     @Override
     public List<ClienteDTO> listar() {
-        return repository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
+        return repository.findByEstadoTrue().stream().map(mapper::toDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -61,5 +66,18 @@ public class ClienteServiceImpl implements ClienteService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con ID: " + id));
         cliente.setEstado(false);
         repository.save(cliente);
+    }
+
+    @Override
+    public List<VentaHistorialDTO> getHistorial(Integer id) {
+        return ventaRepository.findByCliente_IdClienteOrderByFechaVentaDesc(id).stream()
+                .map(v -> new VentaHistorialDTO(
+                        v.getIdVenta(),
+                        v.getFechaVenta(),
+                        v.getSerie() + "-" + v.getNumeroComprobante(),
+                        v.getTotal(),
+                        v.getEstado()
+                ))
+                .collect(Collectors.toList());
     }
 }

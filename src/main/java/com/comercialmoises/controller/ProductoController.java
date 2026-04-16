@@ -1,5 +1,6 @@
 package com.comercialmoises.controller;
 
+import com.comercialmoises.dto.MovimientoInventarioDTO;
 import com.comercialmoises.dto.ProductoDTO;
 import com.comercialmoises.services.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,11 @@ public class ProductoController {
     @GetMapping("/{id}")
     public ResponseEntity<ProductoDTO> buscarPorId(@PathVariable Integer id) {
         return ResponseEntity.ok(service.buscarPorId(id));
+    }
+
+    @GetMapping("/{id}/historial")
+    public ResponseEntity<List<MovimientoInventarioDTO>> getHistorial(@PathVariable Integer id) {
+        return ResponseEntity.ok(service.getHistorial(id));
     }
 
     @PostMapping

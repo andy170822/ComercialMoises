@@ -1,9 +1,11 @@
 package com.comercialmoises.services.impl;
 
+import com.comercialmoises.dto.MovimientoInventarioDTO;
 import com.comercialmoises.dto.ProductoDTO;
 import com.comercialmoises.exception.ResourceNotFoundException;
 import com.comercialmoises.mappers.ProductoMapper;
 import com.comercialmoises.model.Producto;
+import com.comercialmoises.repository.MovimientoInventarioRepository;
 import com.comercialmoises.repository.ProductoRepository;
 import com.comercialmoises.services.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +20,14 @@ public class ProductoServiceImpl implements ProductoService {
     private ProductoRepository repository;
 
     @Autowired
+    private MovimientoInventarioRepository movimientoRepository;
+
+    @Autowired
     private ProductoMapper mapper;
 
     @Override
     public List<ProductoDTO> listar() {
-        return repository.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
+        return repository.findByEstadoTrue().stream().map(mapper::toDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -58,5 +63,18 @@ public class ProductoServiceImpl implements ProductoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con ID: " + id));
         producto.setEstado(false);
         repository.save(producto);
+    }
+
+    @Override
+    public List<MovimientoInventarioDTO> getHistorial(Integer id) {
+        return movimientoRepository.findByProducto_IdProductoOrderByFechaMovimientoDesc(id)
+                .stream()
+                .map(m -> new MovimientoInventarioDTO(
+                        m.getIdMovimiento(),
+                        m.getTipoMovimiento(),
+                        m.getCantidad(),
+                        m.getFechaMovimiento(),
+                        m.getObservacion()))
+                .collect(Collectors.toList());
     }
 }

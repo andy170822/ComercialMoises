@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/productos/**").hasAnyRole("ADMIN", "ALMACENERO", "VENDEDOR")
                         .requestMatchers("/api/compras/**").hasAnyRole("ADMIN", "ALMACENERO")
                         .requestMatchers("/api/ventas/**").hasAnyRole("ADMIN", "VENDEDOR")
+                        .requestMatchers("/api/cotizaciones/**").hasAnyRole("ADMIN", "VENDEDOR")
                         .anyRequest().authenticated())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 

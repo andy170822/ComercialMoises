@@ -1,6 +1,7 @@
 package com.comercialmoises.services;
 
 import com.comercialmoises.dto.ClienteDTO;
+import com.comercialmoises.dto.VentaHistorialDTO;
 import java.util.List;
 
 public interface ClienteService {
@@ -13,4 +14,6 @@ public interface ClienteService {
     ClienteDTO actualizar(Integer id, ClienteDTO dto);
 
     void eliminar(Integer id);
+
+    List<VentaHistorialDTO> getHistorial(Integer id);
 }

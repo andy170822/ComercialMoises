@@ -1,11 +1,14 @@
 package com.comercialmoises.service;
 
+import com.comercialmoises.dto.CotizacionDTO;
+import com.comercialmoises.mappers.CotizacionMapper;
 import com.comercialmoises.model.Cotizacion;
 import com.comercialmoises.repository.CotizacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CotizacionService {
@@ -13,8 +16,13 @@ public class CotizacionService {
     @Autowired
     private CotizacionRepository cotizacionRepository;
 
-    public List<Cotizacion> listarTodas() {
-        return cotizacionRepository.findAll();
+    @Autowired
+    private CotizacionMapper mapper;
+
+    public List<CotizacionDTO> listarTodas() {
+        return cotizacionRepository.findByEstadoNot("ELIMINADA").stream()
+                .map(mapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     public Cotizacion guardar(Cotizacion cotizacion) {
@@ -23,15 +31,18 @@ public class CotizacionService {
         return cotizacionRepository.save(cotizacion);
     }
 
-    public Cotizacion obtenerPorId(Long id) {
+    public CotizacionDTO obtenerPorId(Long id) {
         if (id == null)
             return null;
-        return cotizacionRepository.findById(id).orElse(null);
+        return cotizacionRepository.findById(id).map(mapper::toDTO).orElse(null);
     }
 
     public void eliminar(Long id) {
         if (id == null)
             return;
-        cotizacionRepository.deleteById(id);
+        cotizacionRepository.findById(id).ifPresent(c -> {
+            c.setEstado("ELIMINADA");
+            cotizacionRepository.save(c);
+        });
     }
 }
